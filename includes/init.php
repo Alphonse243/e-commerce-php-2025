@@ -1,12 +1,16 @@
 <?php
+
+if (!file_exists(__DIR__ . '/../vendor/autoload.php')) {
+    die('Please run "composer install" first.');
+}
+
 require_once __DIR__ . '/config.php';
+require_once __DIR__ . '/../vendor/autoload.php';
 
 spl_autoload_register(function ($class) {
-    $file = __DIR__ . '/../classes/' . $class . '.php';
+    $file = __DIR__ . '/../classes/' . str_replace('\\', '/', $class) . '.php';
     if (file_exists($file)) {
-        require_once $file;
-    } else {
-        throw new Exception("Impossible de charger la classe $class. Fichier non trouvé : $file");
+        require $file;
     }
 });
 

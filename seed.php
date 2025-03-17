@@ -1,50 +1,60 @@
 <?php
+// Configuration des erreurs PHP pour le débogage
 error_reporting(E_ALL);
 ini_set('display_errors', 1);
 
+// Chargement des dépendances
+require_once __DIR__ . '/vendor/autoload.php';
 require_once __DIR__ . '/includes/init.php';
+require_once __DIR__ . '/database/seeding/ProductSeeder.php';
+
+/**
+ * Interface utilisateur pour le seeding
+ * Affiche un formulaire de confirmation avant de lancer le processus
+ */
+if (!isset($_POST['start_seeding'])) {
+    echo <<<HTML
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Database Seeding</title>
+        <style>
+            .warning { color: orange; margin-bottom: 20px; }
+            .btn { 
+                padding: 10px 20px;
+                background-color: #ff6c00;
+                color: white;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
+            }
+            .btn:hover { background-color: #ff8533; }
+        </style>
+    </head>
+    <body>
+        <p class="warning">Cette action va ajouter 50 nouveaux produits à la table products.</p>
+        <form method="POST">
+            <input type="submit" name="start_seeding" value="Ajouter les Produits" class="btn">
+        </form>
+    </body>
+    </html>
+    HTML;
+    exit;
+}
 
 try {
-    echo "Début du seeding...<br>";
+    echo "Début de l'ajout des produits...<br>";
     
-    // Tester la connexion à la base de données
+    // Initialisation de la connexion à la base de données
     $db = Database::getInstance();
     echo "Connexion à la base de données réussie.<br>";
     
-    // Vérifier si la table existe
-    $tables = $db->query("SHOW TABLES LIKE 'products'")->fetchAll();
-    if (empty($tables)) {
-        // Créer la table si elle n'existe pas
-        $db->exec("CREATE TABLE IF NOT EXISTS products (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            name VARCHAR(255) NOT NULL,
-            slug VARCHAR(255) NOT NULL UNIQUE,
-            description TEXT,
-            price DECIMAL(10,2) NOT NULL,
-            original_price DECIMAL(10,2),
-            category VARCHAR(100),
-            stock INT DEFAULT 0,
-            brand VARCHAR(100),
-            rating DECIMAL(3,2) DEFAULT 0,
-            image VARCHAR(255),
-            image2 VARCHAR(255),
-            image3 VARCHAR(255),
-            specs JSON,
-            features TEXT,
-            is_featured BOOLEAN DEFAULT FALSE,
-            is_new BOOLEAN DEFAULT FALSE,
-            is_sale BOOLEAN DEFAULT FALSE,
-            created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-            FULLTEXT KEY products_search (name, description)
-        ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci");
-        echo "Table 'products' créée.<br>";
-    }
-    
-    $seeder = new ProductSeeder();
-    $seeder->seed();
-    echo "Seeding terminé avec succès!";
+    // Exécution du seeding
+    $seeder = new Database\Seeding\ProductSeeder();
+    $seeder->seed(); // Génère 50 produits par défaut
+    echo "Ajout des produits terminé avec succès!";
     
 } catch (Exception $e) {
-    die("Erreur : " . $e->getMessage() . "<br>Fichier : " . $e->getFile() . "<br>Ligne : " . le->getLine());
+    // Gestion des erreurs avec affichage détaillé
+    die("Erreur : " . $e->getMessage() . "<br>Fichier : " . $e->getFile() . "<br>Ligne : " . $e->getLine());
 }

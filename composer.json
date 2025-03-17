@@ -1,0 +1,20 @@
+{
+    "name": "karma/master",
+    "description": "site web de vente en ligne",
+    "autoload": {
+        "psr-4": {
+            "Karma\\Master\\": "src/",
+            "App\\": "includes/",
+            "Database\\Seeding\\": "database/seeding/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Alphonse243",
+            "email": "alphonsekatumbascience@gmail.com"
+        }
+    ],
+    "require": {
+        "fakerphp/faker": "^1.20"
+    }
+}
